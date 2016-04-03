@@ -157,61 +157,6 @@ function processForm(formObject) {
 
 function export_gcal_to_gsheet(){
 
-  function export_income_cal_to_gsheet(){
-
-    var mycal = "[calendaraddress]@group.calendar.google.com";
-    var cal = CalendarApp.getCalendarById(mycal);
-    var events = cal.getEvents(new Date(startDate), new Date(endDate));
-
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    SpreadsheetApp.setActiveSheet(ss.getSheets()[0]);
-    var sheet = SpreadsheetApp.getActiveSheet();
-    sheet.clearContents();
-
-    var header = [["Payment Description", "Payment Method", "Amount Due", "Due Date", "Last Updated"]]
-    var range = sheet.getRange(5,1,1,5);
-    range.setValues(header);
-    range.setFontWeight("bold")
-    range.setHorizontalAlignment("center");
-    range.setBorder(true, true, true, true, null, null);
-
-    for (var i=0;i<events.length;i++) {
-    var row=i+6;
-    var myformula_placeholder = '';
-
-    var details=[[events[i].getTitle(), events[i].getDescription(), myformula_placeholder, events[i].getStartTime(), events[i].getLastUpdated()]];
-    var range=sheet.getRange(row,1,1,5);
-    range.setValues(details);
-    var cell=sheet.getRange(row,3);
-    cell.setFormula('=SPLIT( LOWER(A' +row+ ') ; "abcdefghijklmnopqrstuvwxyz &:" )');
-    cell.setNumberFormat("$0.00");
-    }
-
-    var dates = sheet.getRange("a1");
-    dates.setValue("Date Range:").setHorizontalAlignment("left");
-    var bills = sheet.getRange("a2");
-    bills.setValue("Total Bills:");
-    var due = sheet.getRange("a3");
-    due.setValue("Total Due:");
-    var bold = sheet.getRange(1, 1, 3, 1);
-    bold.setFontWeight("bold");
-
-    sheet.getRange("b1").setValue(formatStartDate).setHorizontalAlignment("left");
-    var count=sheet.getRange("b2");
-    count.setFormula("=COUNTA(a6:a)");
-    count.setHorizontalAlignment("left");
-    count.setNumberFormat("0");
-    var sum=sheet.getRange("b3");
-    sum.setFormula("=SUM(c2:c)");
-    sum.setNumberFormat("$0.00");
-    sum.setHorizontalAlignment("left");
-    sum.setFontColor("#c53929").setFontWeight("bold");
-    sheet.getRange("c1").setValue("<<<     to     >>>").setFontWeight("bold").setHorizontalAlignment("center");
-    sheet.getRange("d1").setValue(formatEndDate).setHorizontalAlignment("left");
-
-
-  }
-
 //
 // Export Google Calendar Events to a Google Spreadsheet
 //
@@ -244,7 +189,7 @@ SpreadsheetApp.setActiveSheet(ss.getSheets()[0]);
 var sheet = SpreadsheetApp.getActiveSheet();
 
 // Uncomment this next line if you want to always clear the spreadsheet content before running - Note people could have added extra columns on the data though that would be lost
-// sheet.clearContents();
+sheet.clearContents();
 
 // Create a header record on the current spreadsheet in cells A1:E1 - Match the number of entries in the "header=" to the last parameter
 // of the getRange entry below
