@@ -155,21 +155,20 @@ function processForm(formObject) {
   Logger.log(formatEndDate);
   export_gcal_to_gsheet();
 
-function export_gcal_to_gsheet(){
-
 //
 // Export Google Calendar Events to a Google Spreadsheet
 //
 // This code retrieves events between 2 dates for the specified calendar.
-// It logs the results in the first sheet of the spreadsheet listing the events,
-// dates/times, etc.
+// It logs the results in the first sheet of the spreadsheet listing the events, dates/times, etc.
 //
 // Reference Websites:
 // https://developers.google.com/apps-script/reference/calendar/calendar
 // https://developers.google.com/apps-script/reference/calendar/calendar-event
+// https://developers.google.com/apps-script/reference/spreadsheet/range#setbordertop-left-bottom-right-vertical-horizontal
+function export_gcal_to_gsheet(){
 
-var mycal = "[calendaraddress]@group.calendar.google.com";
-var cal = CalendarApp.getCalendarById(mycal);
+  var mycal = "[calendaraddress]@group.calendar.google.com";
+  var cal = CalendarApp.getCalendarById(mycal);
 
 // Enter beginning and ending date range. -- deprecated 2/16/16 due to implementing jquery datepicker
 // var begin_date = ("02-16-2016");
@@ -180,101 +179,100 @@ var cal = CalendarApp.getCalendarById(mycal);
 // var events = cal.getEvents(new Date("January 3, 2014 00:00:00 CST"), new Date("January 14, 2014 23:59:59 CST"));
 // var events = cal.getEvents(new Date("January 3, 2014 00:00:00 CST"), new Date("January 14, 2014 23:59:59 CST"), {search: 'word1'});
 // var events = cal.getEvents(new Date("January 1, 2016 00:00:00 CST"), new Date("January 14, 2016 23:59:59 CST"));
-var events = cal.getEvents(new Date(startDate), new Date(endDate));
+  var events = cal.getEvents(new Date(startDate), new Date(endDate));
 
-// Get the active spreadsheet and make the first sheet active. Select the first active sheet as a variable. Fixes accidentally overwriting contents of the wrong sheet when running the script with
-// another sheet (besides the first sheet) active.
-var ss = SpreadsheetApp.getActiveSpreadsheet();
-SpreadsheetApp.setActiveSheet(ss.getSheets()[0]);
-var sheet = SpreadsheetApp.getActiveSheet();
+// Get the active spreadsheet and make the first sheet active. Select the first active sheet as a variable. Fixes accidentally overwriting contents
+//   of the wrong sheet when running the script from another active sheet.
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+    SpreadsheetApp.setActiveSheet(ss.getSheets()[0]);
+  var sheet = SpreadsheetApp.getActiveSheet();
 
-// Uncomment this next line if you want to always clear the spreadsheet content before running - Note people could have added extra columns on the data though that would be lost
-sheet.clearContents();
+// Clear the spreadsheet content before running.
+    sheet.clearContents();
 
-// Create a header record on the current spreadsheet in cells A1:E1 - Match the number of entries in the "header=" to the last parameter
+// Create a header record on the current spreadsheet in cells A7:E7 - Match the number of entries in the "header=" to the last parameter
 // of the getRange entry below
 // getRange syntax = getRange(row, column, numRows, numColumns)
-var header = [["Payment Description", "Payment Method", "Amount Due", "Due Date", "Last Updated"]]
-var range = sheet.getRange(5,1,1,5);
-range.setValues(header);
-range.setFontWeight("bold")
-range.setHorizontalAlignment("center");
-range.setBorder(true, true, true, true, null, null);
+// setBorder syntax = setBorder(top, left, bottom, right, vertical, horizontal)
+  var header = [["Description", "Transaction Type", "Amount", "Due Date", "Last Updated"]]
+  var range = sheet.getRange(7,1,1,5);
+    range.setValues(header);
+    range.setFontWeight("bold")
+    range.setHorizontalAlignment("center");
+    range.setBorder(true, true, true, true, null, null);
   
-// Loop through all calendar events found and write them out starting on calculated ROW 6 (i+6)
-for (var i=0;i<events.length;i++) {
-var row=i+6;
-var myformula_placeholder = '';
+// Loop through all calendar events found and write them out starting on calculated ROW 8 (i+8)
+  for (var i=0;i<events.length;i++) {
+  var row=i+8;
+  var myformula_placeholder = '';
+
 // Matching the "header=" entry above, this is the detailed row entry "details=", and must match the number of entries of the GetRange entry below
 // NOTE: I've had problems with the getVisibility for some older events not having a value, so I've had do add in some NULL text to make sure it does not error
-var details=[[events[i].getTitle(), events[i].getDescription(), myformula_placeholder, events[i].getStartTime(), events[i].getLastUpdated()]];
-var range=sheet.getRange(row,1,1,5);
-range.setValues(details);
+  var details=[[events[i].getTitle(), events[i].getDescription(), myformula_placeholder, events[i].getStartTime(), events[i].getLastUpdated()]];
+  var range=sheet.getRange(row,1,1,5);
+    range.setValues(details);
 
 // Writing formulas from scripts requires that you write the formulas separate from non-formulas
-// Write the formula out for this specific row in column 7 to match the position of the field myformula_placeholder from above: foumula over columns F-E for time calc
-var cell=sheet.getRange(row,3);
-cell.setFormula('=SPLIT( LOWER(A' +row+ ') ; "abcdefghijklmnopqrstuvwxyz &:" )');
-cell.setNumberFormat("$0.00");
+// Write the formula out for this every row in column 3 to match the position of the field myformula_placeholder from above.
+// Formula separates the numeric value from the description of the event in column 1 and formats the result as $0.00.
+  var cell=sheet.getRange(row,3);
+    cell.setFormula('=SPLIT( LOWER(A' +row+ ') ; "abcdefghijklmnopqrstuvwxyz &:" )').setNumberFormat("$0.00");
+  }
 
-}
+// Define output headings in a1:a5 (Date Range, Deposits, Withdrawals, Income, Expenses) with bold format
+  var dates = sheet.getRange("a1");
+    dates.setValue("Date Range:").setHorizontalAlignment("left");
+  var deposits = sheet.getRange("a2");
+    deposits.setValue("Deposits:");
+  var withdrawals = sheet.getRange("a3");
+    withdrawals.setValue("Withdrawals:");
+  var income = sheet.getRange("a4");
+    income.setValue("Income");
+  var expenses = sheet.getRange("a5");
+    expenses.setValue("Expenses");
+  var bold = sheet.getRange(1, 1, 5, 1);
+    bold.setFontWeight("bold");
 
-// https://developers.google.com/apps-script/reference/spreadsheet/range#setbordertop-left-bottom-right-vertical-horizontal
-// setBorder syntax = setBorder(top, left, bottom, right, vertical, horizontal) 
-var dates = sheet.getRange("a1");
-dates.setValue("Date Range:").setHorizontalAlignment("left");
-var bills = sheet.getRange("a2");
-bills.setValue("Total Bills:");
-var due = sheet.getRange("a3");
-due.setValue("Total Due:");
-var bold = sheet.getRange(1, 1, 3, 1);
-bold.setFontWeight("bold");
+// Format start and end dates in header.
+    sheet.getRange("b1").setValue(formatStartDate).setHorizontalAlignment("left");
+    sheet.getRange("c1").setValue("<<<     to     >>>").setFontWeight("bold").setHorizontalAlignment("center");
+    sheet.getRange("d1").setValue(formatEndDate).setHorizontalAlignment("left");
 
-//var formattedStartDate = Utilities.formatDate(new Date(startDate), "GMT -0600", "EEEE, MMMM d, yyyy");
-//var formattedEndDate = Utilities.formatDate(new Date(endDate), "GMT -0600", "EEEE, MMMM d, yyyy");
-//Logger.log(formattedStartDate);
-//Logger.log(formattedEndDate);
+// Add formulas for calculating number of deposits and withdrawals and sums for income and expenses. Format output of the formulas.
+  var countDeposits=sheet.getRange("b2");
+    countDeposits.setFormula("=COUNTA(filter(C8:C,C8:C>0))").setNumberFormat("0").setHorizontalAlignment("left");
+  var countWithdrawals=sheet.getRange("b3");
+    countWithdrawals.setFormula("=COUNTA(filter(C8:C,C8:C<0))").setNumberFormat("0").setHorizontalAlignment("left");
+  var sumIncome=sheet.getRange("b4");
+    sumIncome.setFormula("=SUM(filter(C8:C,C8:C>0))").setNumberFormat("$0.00").setHorizontalAlignment("left");
+  var sumExpenses=sheet.getRange("b5");
+    sumExpenses.setFormula("=SUM(filter(C8:C,C8:C<0))").setNumberFormat("$0.00").setHorizontalAlignment("left").setFontColor("#c53929").setFontWeight("bold");
 
-sheet.getRange("b1").setValue(formatStartDate).setHorizontalAlignment("left");
-var count=sheet.getRange("b2");
-count.setFormula("=COUNTA(a6:a)");
-count.setHorizontalAlignment("left");
-count.setNumberFormat("0");
-var sum=sheet.getRange("b3");
-sum.setFormula("=SUM(c2:c)");
-sum.setNumberFormat("$0.00");
-sum.setHorizontalAlignment("left");
-sum.setFontColor("#c53929").setFontWeight("bold");
-sheet.getRange("c1").setValue("<<<     to     >>>").setFontWeight("bold").setHorizontalAlignment("center");
-sheet.getRange("d1").setValue(formatEndDate).setHorizontalAlignment("left");
-
-// freeze first five rows
-sheet.setFrozenRows(5);
+// freeze first seven rows
+    sheet.setFrozenRows(7);
 
 // auto resize columns 1, 2, and 4
-sheet.autoResizeColumn(1);
-sheet.autoResizeColumn(2);
+    sheet.autoResizeColumn(1);
+    sheet.autoResizeColumn(2);
 // sheet.autoResizeColumn(3);
-sheet.autoResizeColumn(4);
+    sheet.autoResizeColumn(4);
 // sheet.autoResizeColumn(5);
 
 // clean up unused columns
 // sheet.deleteColumns(6, 21)
 
 // clean up unused rows: http://stackoverflow.com/questions/33787057/how-to-set-a-sheets-number-of-rows-and-columns-at-creation-time-and-a-word-ab
-var sheetRows = sheet.getMaxRows();
-var lastRow = sheet.getLastRow();
-if (sheetRows > lastRow) {
+  var sheetRows = sheet.getMaxRows();
+  var lastRow = sheet.getLastRow();
+  if (sheetRows > lastRow) {
     sheet.deleteRows(lastRow+1, sheetRows-lastRow);
-}
+  }
 
 // clean up unused columns
-var sheetColumns = sheet.getMaxColumns();
-Logger.log(sheetColumns);
-var lastColumn = sheet.getLastColumn();
-Logger.log(lastColumn);
-if (sheetColumns > lastColumn) {
-    sheet.deleteColumns(lastColumn+1, sheetColumns-lastColumn);
-}
-}
+  var sheetColumns = sheet.getMaxColumns();
+  var lastColumn = sheet.getLastColumn();
+  if (sheetColumns > lastColumn) {
+      sheet.deleteColumns(lastColumn+1, sheetColumns-lastColumn);
+  }
+ }
 }
