@@ -244,9 +244,9 @@ function export_gcal_to_gsheet(){
   var countWithdrawals=sheet.getRange("b3");
     countWithdrawals.setFormula("=COUNTA(filter(C8:C,C8:C<0))").setNumberFormat("0").setHorizontalAlignment("left");
   var sumIncome=sheet.getRange("b4");
-    sumIncome.setFormula("=SUM(filter(C8:C,C8:C>0)").setNumberFormat("$0.00").setHorizontalAlignment("left");
+    sumIncome.setFormula("=SUM(filter(C8:C,C8:C>0))").setNumberFormat("$0.00").setHorizontalAlignment("left");
   var sumExpenses=sheet.getRange("b5");
-    sumExpenses.setFormula("=SUM(filter(C8:C,C8:C<0)").setNumberFormat("$0.00").setHorizontalAlignment("left")setFontColor("#c53929").setFontWeight("bold");
+    sumExpenses.setFormula("=SUM(filter(C8:C,C8:C<0))").setNumberFormat("$0.00").setHorizontalAlignment("left").setFontColor("#c53929").setFontWeight("bold");
 
 // freeze first seven rows
     sheet.setFrozenRows(7);
