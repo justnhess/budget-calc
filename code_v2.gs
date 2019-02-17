@@ -167,7 +167,7 @@ function processForm(formObject) {
   // https://developers.google.com/apps-script/reference/spreadsheet/range#setbordertop-left-bottom-right-vertical-horizontal
   function export_gcal_to_gsheet() {
 
-    var mycal = "[calendaraddress]@group.calendar.google.com"; // calendar ID goes here
+    var mycal = "#########################@group.calendar.google.com"; // calendar ID goes here
     var cal = CalendarApp.getCalendarById(mycal);
 
     // Enter beginning and ending date range. -- deprecated 2/16/16 due to implementing jquery datepicker
@@ -212,7 +212,7 @@ function processForm(formObject) {
     bold.setFontWeight("bold");
 
     // Create a header record on the current spreadsheet in cells A8:F8 - Match the number of entries in the "header=" to the last parameter
-    // of the getRange entry below.
+    //  of the getRange entry below.
     // getRange syntax = getRange(row, column, numRows, numColumns)
     // setBorder syntax = setBorder(top, left, bottom, right, vertical, horizontal)
     var header = [

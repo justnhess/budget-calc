@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <link rel="stylesheet" href="/resources/demos/style.css">
 
-  </head>
-  <body>
-    <p><b>Please select a start date/time and end date/time:</b></p>
-    <form id="formObject" onsubmit="handleFormSubmit(this);return false;">
-    <p>Start date and time:<br>
-    <i>(choose 12:00 AM to include all events)</i></p>
-      <input name="myStart" type="datetime-local" autofocus="autofocus" />
-    <p>End date and time:<br>
-    <i>(choose 11:00 PM to avoid including the following day's events)</i></p>
-      <input name="myEnd" type="datetime-local" />
-      <br><br>
-      <input type="submit" value="Submit" />&nbsp;
-      <input type="button" value="Close"
-        onclick="google.script.host.close()" />
-    </form>
-  </body>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
   <script>
-      function handleFormSubmit(formObject) {
-      alert("Your dates have been submitted.");
-      google.script.run.processForm(formObject);
-      }
-  </script>
+    function handleFormSubmit(formObject) {
+        alert("Your dates have been submitted.");
+        google.script.run.processForm(formObject);
+        }
+    </script>
+</head>
+
+<body>
+  <p><b>Please select a start date/time and end date/time:</b></p>
+  <form id="formObject" onsubmit="handleFormSubmit(this);return false;">
+    <p>Start date and time:<br>
+      <i>(choose 12:00 AM to include all events)</i></p>
+    <input name="myStart" type="datetime-local" autofocus="autofocus" />
+    <p>End date and time:<br>
+      <i>(choose 11:00 PM to avoid including the following day's events)</i></p>
+    <input name="myEnd" type="datetime-local" />
+    <br><br>
+    <input type="submit" value="Submit" />&nbsp;
+    <input type="button" value="Close" onclick="google.script.host.close()" />
+  </form>
+</body>
+
 </html>
